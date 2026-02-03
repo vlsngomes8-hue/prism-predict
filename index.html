@@ -9,7 +9,7 @@
 body{
   background:#020617;
   color:#fff;
-  font-family:system-ui, sans-serif;
+  font-family:system-ui,sans-serif;
   padding:14px;
 }
 h2{margin-bottom:10px}
@@ -74,15 +74,19 @@ img{
 <h2>PrismPredict AI</h2>
 
 <div class="box">
-  <b>Period ID:</b> <span id="periodId"></span>
+  <b>Current Period:</b>
+  <span id="currentPeriod"></span><br>
+  <small style="color:#94a3b8">
+    Next update in <span id="timer"></span>s
+  </small>
 </div>
 
 <div class="grid" id="buttons"></div>
 
 <div class="box">
   <h3>Prediction</h3>
-  <button onclick="predict()">Predict Next</button>
-  <div id="predictionResult" style="margin-top:8px"></div>
+  <button onclick="predict()">Predict Upcoming</button>
+  <div id="predictionResult"></div>
 </div>
 
 <div class="box">
@@ -97,11 +101,14 @@ img{
 </div>
 
 <div class="box">
-  <h3>Add Photo / Screenshot</h3>
-  <input type="file" accept="image/*" onchange="savePhoto(event)">
+  <h3>Add Photo / Auto Extract</h3>
+  <input type="file" accept="image/*" onchange="extractFromPhoto(event)">
+  <div id="ocrStatus" style="color:#38bdf8;margin-top:6px"></div>
   <img id="photoPreview">
 </div>
 
+<!-- OCR LIBRARY -->
+<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
