@@ -1,79 +1,87 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>AI Predictor</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+let extractedData = [];
+let history = [];
 
-<style>
-body{
-  background:#0b1220;
-  color:#fff;
-  font-family:system-ui;
-  padding:20px;
+const extractedDiv = document.getElementById("extracted");
+const predictionDiv = document.getElementById("prediction");
+const statusDiv = document.getElementById("status");
+
+// ===== COLOR =====
+function color(n){
+  if(n===0||n===5) return "violet";
+  return n%2===0?"red":"green";
 }
-.box{
-  background:#111827;
-  padding:16px;
-  border-radius:14px;
-  margin-bottom:16px;
+
+// ===== CREATE BUTTONS =====
+const btns = document.getElementById("buttons");
+for(let i=0;i<=9;i++){
+  const d=document.createElement("div");
+  d.className="num "+color(i);
+  d.innerText=i;
+  d.onclick=()=>addManual(i);
+  btns.appendChild(d);
 }
-button{
-  background:#2563eb;
-  border:none;
-  padding:10px 16px;
-  color:white;
-  border-radius:10px;
-  font-size:15px;
+
+// ===== OCR EXTRACT =====
+function extract(){
+  const file=document.getElementById("photo").files[0];
+  if(!file){
+    statusDiv.innerText="Select image first";
+    return;
+  }
+
+  statusDiv.innerText="Reading image...";
+  Tesseract.recognize(
+    file,
+    "eng",
+    { tessedit_char_whitelist:"0123456789" }
+  ).then(({data:{text}})=>{
+    extractedData = (text.match(/\d/g)||[])
+      .map(n=>parseInt(n))
+      .filter(n=>n>=0&&n<=9);
+
+    if(extractedData.length===0){
+      statusDiv.innerText="No numbers found";
+      return;
+    }
+
+    history = extractedData.slice(-5); // ONLY latest
+    extractedDiv.innerText = history.join(", ");
+    statusDiv.innerText="Data loaded. Add next result.";
+    predictionDiv.innerText="Waiting for manual input";
+  });
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
+
+// ===== MANUAL ADD =====
+function addManual(n){
+  history.push(n);
+  if(history.length>6) history.shift();
+  extractedDiv.innerText = history.join(", ");
+  predictNext();
 }
-.num{
-  padding:14px;
-  border-radius:10px;
-  font-size:18px;
-  font-weight:bold;
-  text-align:center;
+
+// ===== AI PREDICTION =====
+function predictNext(){
+  if(history.length<4){
+    predictionDiv.innerText="Need more data";
+    return;
+  }
+
+  let score = Array(10).fill(0);
+
+  // frequency
+  history.forEach(n=>score[n]+=2);
+
+  // recent trend
+  history.slice(-3).forEach(n=>score[n]+=3);
+
+  // gap
+  for(let i=0;i<=9;i++){
+    if(!history.includes(i)) score[i]+=4;
+  }
+
+  // avoid repeat
+  score[history[history.length-1]] -= 5;
+
+  const pick = score.indexOf(Math.max(...score));
+  predictionDiv.innerText = pick;
 }
-.green{background:#22c55e}
-.red{background:#ef4444}
-.violet{background:#8b5cf6}
-.result{
-  font-size:26px;
-  font-weight:800;
-}
-</style>
-</head>
-
-<body>
-
-<h2>AI Next Predictor</h2>
-
-<div class="box">
-  <input type="file" id="photo" accept="image/*">
-  <button onclick="extract()">Extract Data</button>
-  <div id="status"></div>
-</div>
-
-<div class="box">
-  <h3>Extracted Data (from photo)</h3>
-  <div id="extracted"></div>
-</div>
-
-<div class="box">
-  <h3>Add Latest Result (Manual)</h3>
-  <div class="grid" id="buttons"></div>
-</div>
-
-<div class="box">
-  <h3>🤖 AI Prediction (Next)</h3>
-  <div class="result" id="prediction">Waiting for data</div>
-</div>
-
-<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
