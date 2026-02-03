@@ -1,100 +1,107 @@
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
-/* ===== AUTO PERIOD ===== */
-function getPeriod(){
-  return Math.floor(Date.now()/60000);
+/* ===== AUTO PERIOD (SIMPLE & SAFE) ===== */
+function updatePeriod(){
+  document.getElementById("period").innerText =
+    Math.floor(Date.now() / 60000); // updates every minute
 }
-setInterval(()=>period.innerText=getPeriod(),1000);
+setInterval(updatePeriod, 1000);
+updatePeriod();
 
 /* ===== STATE ===== */
-let data=[];
-const status=document.getElementById("status");
-const preview=document.getElementById("preview");
+let data = []; // latest numbers only
+const status = document.getElementById("status");
+const preview = document.getElementById("preview");
 
 /* ===== COLOR / SIZE ===== */
 function color(n){
-  if(n===0||n===5) return "VIOLET";
-  return n%2===0?"RED":"GREEN";
+  if(n === 0 || n === 5) return "VIOLET";
+  return n % 2 === 0 ? "RED" : "GREEN";
 }
-function size(n){return n>=5?"BIG":"SMALL";}
+function size(n){ return n >= 5 ? "BIG" : "SMALL"; }
 
 /* ===== BUTTONS ===== */
-const btns=document.getElementById("buttons");
+const btns = document.getElementById("buttons");
 for(let i=0;i<=9;i++){
-  const b=document.createElement("div");
-  b.className="btn "+(color(i)==="RED"?"red":color(i)==="GREEN"?"green":"violet");
-  b.innerText=i;
-  b.onclick=()=>addResult(i);
+  const b = document.createElement("div");
+  b.className = "btn " + (color(i)==="RED"?"red":color(i)==="GREEN"?"green":"violet");
+  b.innerText = i;
+  b.onclick = () => addResult(i);
   btns.appendChild(b);
 }
 
-/* ===== ADD RESULT ===== */
+/* ===== ADD RESULT NUMBER ===== */
 function addResult(n){
   data.unshift(n);
-  if(data.length>15) data.pop();
-  render();
-  aiPredict();
+  if(data.length > 10) data.pop();
+  renderHistory();
+  aiPredict(); // AUTO predict next
 }
 
-/* ===== RENDER ===== */
-function render(){
-  history.innerHTML=data.map(n=>`${n} ${color(n)} ${size(n)}`).join("<br>");
+/* ===== RENDER HISTORY ===== */
+function renderHistory(){
+  document.getElementById("history").innerHTML =
+    data.map(n => `${n} ${color(n)} ${size(n)}`).join("<br>");
 }
 
-/* ===== 🤖 AI PREDICTION ===== */
+/* ===== 🤖 AI PREDICTION (AUTO) ===== */
 function aiPredict(){
-  if(data.length<5){
-    prediction.innerText="Need more data";
+  if(data.length < 4){
+    document.getElementById("prediction").innerText = "Need more data";
     return;
   }
 
-  let score=Array(10).fill(0);
+  let score = Array(10).fill(0);
 
-  // 1. Frequency (AI memory)
-  data.forEach(n=>score[n]+=2);
+  // Frequency memory
+  data.forEach(n => score[n] += 2);
 
-  // 2. Recent trend (strong weight)
-  data.slice(0,5).forEach(n=>score[n]+=4);
+  // Recent trend boost
+  data.slice(0,4).forEach(n => score[n] += 4);
 
-  // 3. Gap (missing number boost)
+  // Gap (missing numbers)
   for(let i=0;i<=9;i++){
-    const idx=data.indexOf(i);
-    if(idx===-1) score[i]+=6;
-    else score[i]+=Math.min(idx,3);
+    const idx = data.indexOf(i);
+    score[i] += idx === -1 ? 5 : Math.min(idx,3);
   }
 
-  // 4. Momentum break
-  score[data[0]]-=4;
+  // Avoid repeating last number
+  score[data[0]] -= 5;
 
-  const pick=score.indexOf(Math.max(...score));
+  const pick = score.indexOf(Math.max(...score));
 
-  prediction.innerText=
+  document.getElementById("prediction").innerText =
     `${pick} ${color(pick)} ${size(pick)} (AI)`;
 }
 
-/* ===== OCR ===== */
-window.extract=function(){
-  const file=photoInput.files[0];
-  if(!file){status.innerText="Select image";return;}
+/* ===== OCR EXTRACT (LATEST DATA ONLY) ===== */
+window.extract = function(){
+  const file = document.getElementById("photoInput").files[0];
+  if(!file){
+    status.innerText = "Select photo first";
+    return;
+  }
 
-  const r=new FileReader();
-  r.onload=()=>{
-    preview.src=r.result;
-    status.innerText="AI reading image...";
-    Tesseract.recognize(r.result,"eng").then(({data:{text}})=>{
-      const nums=(text.match(/\d/g)||[])
+  const r = new FileReader();
+  r.onload = () => {
+    preview.src = r.result;
+    status.innerText = "Reading image...";
+
+    Tesseract.recognize(r.result, "eng").then(({data:{text}})=>{
+      const nums = (text.match(/\d/g) || [])
         .map(n=>parseInt(n))
-        .filter(n=>n>=0&&n<=9);
+        .filter(n=>n>=0 && n<=9);
 
-      if(nums.length===0){
-        status.innerText="No data found";
+      if(nums.length === 0){
+        status.innerText = "No numbers found";
         return;
       }
 
-      data=[...nums.slice(-5)];
-      render();
-      aiPredict();
-      status.innerText="Latest data loaded";
+      // ONLY latest extracted numbers
+      data = nums.slice(-5);
+      renderHistory();
+      aiPredict(); // AUTO predict after extract
+      status.innerText = "Latest data loaded";
     });
   };
   r.readAsDataURL(file);
