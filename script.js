@@ -1,78 +1,79 @@
-document.addEventListener("DOMContentLoaded", () => {
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Predictor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-const periodEl = document.getElementById("periodId");
-const historyEl = document.getElementById("history");
-const preview = document.getElementById("preview");
-const status = document.getElementById("status");
-
-let history = [];
-
-// ===== AUTO PERIOD (REAL-TIME SIMPLE) =====
-function updatePeriod(){
-  periodEl.innerText = Math.floor(Date.now() / 60000);
+<style>
+body{
+  background:#0b1220;
+  color:#fff;
+  font-family:system-ui;
+  padding:20px;
 }
-setInterval(updatePeriod, 1000);
-updatePeriod();
-
-// ===== COLOR & SIZE =====
-function color(n){
-  if(n === 0 || n === 5) return "Violet";
-  return n % 2 === 0 ? "Red" : "Green";
+.box{
+  background:#111827;
+  padding:16px;
+  border-radius:14px;
+  margin-bottom:16px;
 }
-function size(n){
-  return n >= 5 ? "Big" : "Small";
+button{
+  background:#2563eb;
+  border:none;
+  padding:10px 16px;
+  color:white;
+  border-radius:10px;
+  font-size:15px;
 }
-
-// ===== RENDER HISTORY =====
-function render(){
-  historyEl.innerHTML = "";
-  history.slice(0,12).forEach(n=>{
-    const div = document.createElement("div");
-    div.className = "history-item";
-    div.innerHTML = `
-      <div><b>${n}</b> ${color(n)}</div>
-      <span class="badge ${size(n).toLowerCase()}">${size(n)}</span>
-    `;
-    historyEl.appendChild(div);
-  });
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
 }
+.num{
+  padding:14px;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:bold;
+  text-align:center;
+}
+.green{background:#22c55e}
+.red{background:#ef4444}
+.violet{background:#8b5cf6}
+.result{
+  font-size:26px;
+  font-weight:800;
+}
+</style>
+</head>
 
-// ===== FAST OCR EXTRACT =====
-window.extractFast = function(){
-  const file = document.getElementById("photoInput").files[0];
-  if(!file){
-    status.innerText = "Select image first";
-    return;
-  }
+<body>
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    preview.src = reader.result;
-    status.innerText = "Reading image (fast)…";
+<h2>AI Next Predictor</h2>
 
-    Tesseract.recognize(
-      reader.result,
-      "eng",
-      {
-        tessedit_char_whitelist: "0123456789",
-        classify_bln_numeric_mode: 1
-      }
-    ).then(({data:{text}})=>{
-      const nums = (text.match(/\d/g) || [])
-        .map(n=>parseInt(n))
-        .filter(n=>n>=0 && n<=9);
+<div class="box">
+  <input type="file" id="photo" accept="image/*">
+  <button onclick="extract()">Extract Data</button>
+  <div id="status"></div>
+</div>
 
-      if(nums.length === 0){
-        status.innerText = "No numbers found";
-        return;
-      }
+<div class="box">
+  <h3>Extracted Data (from photo)</h3>
+  <div id="extracted"></div>
+</div>
 
-      history = nums.reverse(); // latest on top
-      render();
-      status.innerText = "Data extracted successfully";
-    });
-  };
-  reader.readAsDataURL(file);
-};
+<div class="box">
+  <h3>Add Latest Result (Manual)</h3>
+  <div class="grid" id="buttons"></div>
+</div>
 
-});
+<div class="box">
+  <h3>🤖 AI Prediction (Next)</h3>
+  <div class="result" id="prediction">Waiting for data</div>
+</div>
+
+<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
