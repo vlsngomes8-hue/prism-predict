@@ -1,36 +1,87 @@
-function predict(){
-  const input = document.getElementById("data").value;
+// ===== PERIOD ID (LIKE REAL APPS) =====
+function getPeriodId(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  const seq = Math.floor(Date.now()/60000);
+  return `${y}${m}${day}${seq}`;
+}
+setInterval(()=>periodId.innerText=getPeriodId(),1000);
+periodId.innerText=getPeriodId();
 
-  let arr = input.split(",")
-    .map(n => parseInt(n.trim()))
-    .filter(n => !isNaN(n) && n >= 0 && n <= 9);
+// ===== STATE =====
+let history = [];
 
-  if(arr.length < 8){
-    document.getElementById("output").innerText =
-      "Enter at least 8–10 numbers";
+// ===== COLOR & SIZE =====
+function color(n){
+  if(n===0||n===5) return "Violet";
+  return n%2===0 ? "Red" : "Green";
+}
+function size(n){
+  return n>=5 ? "Big" : "Small";
+}
+
+// ===== NUMBER GRID =====
+const grid = document.getElementById("numberGrid");
+for(let i=0;i<=9;i++){
+  const d = document.createElement("div");
+  d.className = `num ${color(i)==="Red"?"red":color(i)==="Green"?"green":"violet"}`;
+  d.innerText = i;
+  d.onclick = ()=>addLatest(i);
+  grid.appendChild(d);
+}
+
+// ===== ADD LATEST RESULT =====
+function addLatest(n){
+  history.unshift({
+    period:getPeriodId(),
+    num:n
+  });
+  if(history.length>12) history.pop();
+  renderHistory();
+  predictNext();
+}
+
+// ===== HISTORY UI =====
+function renderHistory(){
+  historyBox.innerHTML="";
+  history.forEach(h=>{
+    const div=document.createElement("div");
+    div.className="history-item";
+    div.innerHTML=`
+      <div>${h.period}<br><b>${h.num}</b> ${color(h.num)}</div>
+      <span class="badge ${size(h.num).toLowerCase()}">${size(h.num)}</span>
+    `;
+    historyBox.appendChild(div);
+  });
+}
+const historyBox=document.getElementById("history");
+
+// ===== AI PREDICTION (SIMPLE & STABLE) =====
+function predictNext(){
+  if(history.length<4){
+    prediction.innerText="Need more data";
     return;
   }
 
-  // Use last 10 only
-  arr = arr.slice(-10);
-
+  const nums = history.map(h=>h.num);
   let score = Array(10).fill(0);
 
-  // 1️⃣ Frequency (hot numbers)
-  arr.forEach(n => score[n] += 2);
+  // frequency
+  nums.forEach(n=>score[n]+=2);
 
-  // 2️⃣ Recent trend (last 4 stronger)
-  arr.slice(-4).forEach(n => score[n] += 3);
+  // recent trend
+  nums.slice(0,3).forEach(n=>score[n]+=3);
 
-  // 3️⃣ Gap (numbers missing)
+  // gap logic
   for(let i=0;i<=9;i++){
-    if(!arr.includes(i)) score[i] += 4;
+    if(!nums.includes(i)) score[i]+=4;
   }
 
-  // 4️⃣ Avoid repeating last
-  score[arr[arr.length-1]] -= 5;
+  // avoid repeat
+  score[nums[0]]-=5;
 
   const pick = score.indexOf(Math.max(...score));
-
-  document.getElementById("output").innerText = pick;
+  prediction.innerText = pick;
 }
