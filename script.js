@@ -32,3 +32,23 @@ function renderHistory(){
   historyDiv.innerHTML = history.slice(0,12)
     .map(h => `<div>${h}</div>`).join("");
 }
+function predict(){
+  if(history.length < 3){
+    document.getElementById("predictionResult").innerText =
+      "Add more history for prediction";
+    return;
+  }
+
+  // take last 3 numbers
+  const lastNums = history.slice(0,3).map(h => parseInt(h));
+  const avg = Math.round(
+    lastNums.reduce((a,b)=>a+b,0) / lastNums.length
+  );
+
+  const predicted = avg % 10;
+  const color = getColor(predicted);
+  const size = getSize(predicted);
+
+  document.getElementById("predictionResult").innerHTML =
+    `<b>${predicted}</b> - ${color.toUpperCase()} - ${size}`;
+}
