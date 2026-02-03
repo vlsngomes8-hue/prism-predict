@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI Predictor</title>
+<title>AI Next Predictor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -13,30 +13,31 @@ body{background:#0b1220;color:#fff;font-family:Arial;padding:14px}
 .green{background:#22c55e}
 .red{background:#ef4444}
 .violet{background:#8b5cf6}
-button{padding:8px 14px;border:none;border-radius:8px;background:#2563eb;color:white}
+button{padding:8px 14px;border:none;border-radius:8px;background:#2563eb;color:white;margin-top:6px}
 img{max-width:100%;border-radius:10px;margin-top:8px}
 </style>
 </head>
 
 <body>
 
-<h2>AI Trend Predictor</h2>
+<h2>AI Next Predictor</h2>
 
 <div class="box">
-  <b>Current Period:</b> <span id="period"></span>
+  <b>Current Period:</b>
+  <span id="period"></span>
 </div>
 
 <div class="box">
   <h3>Upload Latest Photo</h3>
   <input type="file" id="photoInput" accept="image/*">
-  <button onclick="extract()">Extract Data</button>
+  <button onclick="extract()">Extract Latest Data</button>
   <div id="status"></div>
   <img id="preview">
 </div>
 
 <div class="box">
-  <h3>🤖 AI Prediction</h3>
-  <div id="prediction">Upload data first</div>
+  <h3>🤖 AI Next Prediction</h3>
+  <div id="prediction">Upload photo first</div>
 </div>
 
 <div class="box">
@@ -45,7 +46,7 @@ img{max-width:100%;border-radius:10px;margin-top:8px}
 </div>
 
 <div class="box">
-  <h3>Latest Data</h3>
+  <h3>Latest History</h3>
   <div id="history"></div>
 </div>
 
