@@ -12,7 +12,7 @@ body{
   font-family:system-ui,sans-serif;
   padding:14px;
 }
-h2{margin-bottom:10px}
+h2{margin-bottom:12px}
 
 .grid{
   display:grid;
@@ -102,13 +102,15 @@ img{
 
 <div class="box">
   <h3>Add Photo / Auto Extract</h3>
-  <input type="file" accept="image/*" onchange="extractFromPhoto(event)">
+  <input type="file" id="photoInput" accept="image/*">
+  <button onclick="startOCR()">Extract From Photo</button>
   <div id="ocrStatus" style="color:#38bdf8;margin-top:6px"></div>
   <img id="photoPreview">
 </div>
 
-<!-- OCR LIBRARY -->
+<!-- OCR LIBRARY (MUST BE BEFORE script.js) -->
 <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
