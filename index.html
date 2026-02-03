@@ -1,145 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>PrismPredict AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
-  margin:0;
-  font-family:system-ui,-apple-system;
-  background:#0b1220;
-  color:#fff;
-  padding:16px;
-}
-
-.header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:16px;
-}
-.logo{
-  width:40px;height:40px;
-  background:#6366f1;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-}
-
-.card{
-  background:#111827;
-  border-radius:18px;
-  padding:16px;
-  margin-bottom:16px;
-}
-
-.label{
-  color:#94a3b8;
-  font-size:13px;
-  margin-bottom:6px;
-}
-
-.period{
-  background:#020617;
-  border:1px solid #334155;
-  border-radius:14px;
-  padding:14px;
-  font-size:16px;
-  font-weight:600;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-}
-
+body{margin:0;background:#0b1220;color:#fff;font-family:system-ui;padding:16px}
+.card{background:#111827;border-radius:18px;padding:16px;margin-bottom:16px}
+.label{color:#94a3b8;font-size:13px;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .num{
-  padding:18px 0;
-  border-radius:14px;
-  font-size:22px;
-  font-weight:700;
-  text-align:center;
+  padding:18px 0;border-radius:14px;font-size:22px;
+  font-weight:700;text-align:center;opacity:.4;pointer-events:none
 }
-
 .green{background:#22c55e}
 .red{background:#ef4444}
 .violet{background:#8b5cf6}
-
-.upload{
-  border:2px dashed #334155;
-  padding:18px;
-  border-radius:14px;
-  text-align:center;
-  color:#94a3b8;
+button{
+  width:100%;padding:12px;border:none;border-radius:999px;
+  background:#2563eb;color:white;font-size:16px
 }
-
-.history-item{
-  background:#020617;
-  border:1px solid #1e293b;
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.badge{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:600;
-}
-.big{background:#16a34a}
-.small{background:#334155}
-
-.prediction{
-  text-align:center;
-  font-size:26px;
-  font-weight:800;
-  margin-top:10px;
-}
+.prediction{font-size:28px;font-weight:800;text-align:center}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="logo">P</div>
-  <h2>PrismPredict AI</h2>
-</div>
+<h2>PrismPredict AI</h2>
 
-<!-- ADD LATEST DATA -->
 <div class="card">
-  <div class="label">TARGET PERIOD ID</div>
-  <div class="period" id="periodId"></div>
-
-  <div class="label" style="margin-top:12px">SELECT LATEST NUMBER</div>
-  <div class="grid" id="numberGrid"></div>
-
-  <div class="upload" style="margin-top:16px">
-    📷 Upload Vision Scan (optional)
-    <input type="file" hidden>
-  </div>
+  <div class="label">STEP 1: UPLOAD LATEST SCREENSHOT</div>
+  <input type="file" id="photo" accept="image/*">
+  <button onclick="readPhoto()">Read Photo Data</button>
+  <div id="status"></div>
 </div>
 
-<!-- PREDICTION -->
+<div class="card">
+  <div class="label">DATA EXTRACTED FROM PHOTO</div>
+  <div id="photoData">—</div>
+</div>
+
+<div class="card">
+  <div class="label">STEP 2: ADD LATEST RESULT (MANUAL)</div>
+  <div class="grid" id="buttons"></div>
+</div>
+
 <div class="card">
   <div class="label">AI NEXT PREDICTION</div>
   <div class="prediction" id="prediction">—</div>
 </div>
 
-<!-- HISTORY -->
-<div class="card">
-  <div class="label">History Log</div>
-  <div id="history"></div>
-</div>
-
+<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
