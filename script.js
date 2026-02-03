@@ -1,141 +1,103 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",()=>{
 
-/* ========= CONFIG ========= */
-const PERIOD_DURATION = 60; // seconds (change if needed)
-
-/* ========= STATE ========= */
-let history = JSON.parse(localStorage.getItem("history") || "[]");
-
-/* ========= ELEMENTS ========= */
-const buttonsDiv = document.getElementById("buttons");
-const historyDiv = document.getElementById("history");
-const periodEl = document.getElementById("currentPeriod");
-const timerEl = document.getElementById("timer");
-const predictionEl = document.getElementById("predictionResult");
-const photoImg = document.getElementById("photoPreview");
-
-/* ========= PERIOD ENGINE (REAL TIME) ========= */
-function getCurrentPeriod() {
-  return Math.floor(Date.now() / 1000 / PERIOD_DURATION);
+/* ===== AUTO PERIOD ===== */
+function getPeriod(){
+  return Math.floor(Date.now()/60000);
 }
+setInterval(()=>period.innerText=getPeriod(),1000);
 
-function getRemainingSeconds() {
-  const now = Math.floor(Date.now() / 1000);
-  return PERIOD_DURATION - (now % PERIOD_DURATION);
+/* ===== STATE ===== */
+let data=[];
+const status=document.getElementById("status");
+const preview=document.getElementById("preview");
+
+/* ===== COLOR / SIZE ===== */
+function color(n){
+  if(n===0||n===5) return "VIOLET";
+  return n%2===0?"RED":"GREEN";
 }
+function size(n){return n>=5?"BIG":"SMALL";}
 
-function updatePeriodUI() {
-  periodEl.innerText = getCurrentPeriod();
-  timerEl.innerText = getRemainingSeconds();
-}
-
-setInterval(updatePeriodUI, 1000);
-updatePeriodUI();
-
-/* ========= LOGIC ========= */
-function getColor(n){
-  if(n === 0 || n === 5) return "violet";
-  if(n % 2 === 0) return "red";
-  return "green";
-}
-
-function getSize(n){
-  return n >= 5 ? "Big" : "Small";
-}
-
-/* ========= BUTTONS ========= */
+/* ===== BUTTONS ===== */
+const btns=document.getElementById("buttons");
 for(let i=0;i<=9;i++){
-  const btn = document.createElement("div");
-  btn.className = "btn " + getColor(i);
-  btn.innerText = i;
-  btn.onclick = () => addHistory(i);
-  buttonsDiv.appendChild(btn);
+  const b=document.createElement("div");
+  b.className="btn "+(color(i)==="RED"?"red":color(i)==="GREEN"?"green":"violet");
+  b.innerText=i;
+  b.onclick=()=>addResult(i);
+  btns.appendChild(b);
 }
 
-/* ========= ADD RESULT ========= */
-function addHistory(num){
-  history.unshift({
-    period: getCurrentPeriod(),
-    num,
-    color: getColor(num),
-    size: getSize(num)
-  });
-
-  localStorage.setItem("history", JSON.stringify(history));
-  renderHistory();
+/* ===== ADD RESULT ===== */
+function addResult(n){
+  data.unshift(n);
+  if(data.length>15) data.pop();
+  render();
+  aiPredict();
 }
 
-/* ========= HISTORY ========= */
-function renderHistory(){
-  historyDiv.innerHTML = history.slice(0,12).map(h =>
-    `<div>${h.period} → <b>${h.num}</b> ${h.color.toUpperCase()} ${h.size}</div>`
-  ).join("");
-}
-renderHistory();
-
-/* ========= ADVANCED PREDICTION ========= */
-function advancedPredict(){
-  if(history.length < 6) return null;
-
-  const recent = history.slice(0,20).map(h=>h.num);
-  let score = Array(10).fill(0);
-
-  recent.forEach(n => score[n] += 2);
-  recent.slice(0,5).forEach(n => score[n] += 3);
-
-  for(let i=0;i<=9;i++){
-    const idx = recent.indexOf(i);
-    score[i] += idx === -1 ? 5 : Math.min(idx,5);
-  }
-
-  const lastColors = recent.slice(0,4).map(getColor);
-  for(let i=0;i<=9;i++){
-    if(lastColors.filter(c=>c===getColor(i)).length >= 3){
-      score[i] -= 3;
-    }
-  }
-
-  return score.indexOf(Math.max(...score));
+/* ===== RENDER ===== */
+function render(){
+  history.innerHTML=data.map(n=>`${n} ${color(n)} ${size(n)}`).join("<br>");
 }
 
-window.predict = function(){
-  const n = advancedPredict();
-  predictionEl.innerText = n === null
-    ? "Add more data"
-    : `${n} - ${getColor(n).toUpperCase()} - ${getSize(n)}`;
-};
-
-/* ========= OCR ========= */
-window.startOCR = function(){
-  const input = document.getElementById("photoInput");
-  const status = document.getElementById("ocrStatus");
-
-  if(!input.files[0]){
-    status.innerText = "Select image first";
+/* ===== 🤖 AI PREDICTION ===== */
+function aiPredict(){
+  if(data.length<5){
+    prediction.innerText="Need more data";
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = function(){
-    const img = reader.result;
-    photoImg.src = img;
-    status.innerText = "Analyzing image…";
+  let score=Array(10).fill(0);
 
-    Tesseract.recognize(img,"eng").then(({data:{text}})=>{
-      const nums = (text.match(/\d/g)||[])
+  // 1. Frequency (AI memory)
+  data.forEach(n=>score[n]+=2);
+
+  // 2. Recent trend (strong weight)
+  data.slice(0,5).forEach(n=>score[n]+=4);
+
+  // 3. Gap (missing number boost)
+  for(let i=0;i<=9;i++){
+    const idx=data.indexOf(i);
+    if(idx===-1) score[i]+=6;
+    else score[i]+=Math.min(idx,3);
+  }
+
+  // 4. Momentum break
+  score[data[0]]-=4;
+
+  const pick=score.indexOf(Math.max(...score));
+
+  prediction.innerText=
+    `${pick} ${color(pick)} ${size(pick)} (AI)`;
+}
+
+/* ===== OCR ===== */
+window.extract=function(){
+  const file=photoInput.files[0];
+  if(!file){status.innerText="Select image";return;}
+
+  const r=new FileReader();
+  r.onload=()=>{
+    preview.src=r.result;
+    status.innerText="AI reading image...";
+    Tesseract.recognize(r.result,"eng").then(({data:{text}})=>{
+      const nums=(text.match(/\d/g)||[])
         .map(n=>parseInt(n))
         .filter(n=>n>=0&&n<=9);
 
       if(nums.length===0){
-        status.innerText="No numbers found";
+        status.innerText="No data found";
         return;
       }
 
-      nums.forEach(n=>addHistory(n));
-      status.innerText="Extracted: "+nums.join(", ");
+      data=[...nums.slice(-5)];
+      render();
+      aiPredict();
+      status.innerText="Latest data loaded";
     });
   };
-  reader.readAsDataURL(input.files[0]);
+  r.readAsDataURL(file);
 };
 
 });
