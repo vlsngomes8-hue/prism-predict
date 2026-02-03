@@ -14,7 +14,6 @@ body{
   color:#fff;
   padding:16px;
 }
-
 .header{
   display:flex;
   align-items:center;
@@ -30,7 +29,6 @@ body{
   justify-content:center;
   font-weight:800;
 }
-
 .card{
   background:#020617;
   border:1px solid #1e293b;
@@ -38,13 +36,11 @@ body{
   padding:16px;
   margin-bottom:16px;
 }
-
 .label{
   color:#94a3b8;
   font-size:13px;
   margin-bottom:6px;
 }
-
 .period{
   background:#020617;
   border:1px solid #334155;
@@ -53,13 +49,11 @@ body{
   font-size:16px;
   font-weight:600;
 }
-
 .grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
   gap:12px;
 }
-
 .num{
   padding:20px 0;
   border-radius:14px;
@@ -67,7 +61,6 @@ body{
   font-weight:700;
   text-align:center;
 }
-
 .green{background:#22c55e}
 .red{background:#ef4444}
 .violet{background:#8b5cf6}
@@ -78,6 +71,9 @@ body{
   border-radius:14px;
   text-align:center;
   color:#94a3b8;
+}
+.upload button{
+  margin-top:10px;
 }
 
 .history-item{
@@ -90,14 +86,12 @@ body{
   border:1px solid #1e293b;
   margin-bottom:10px;
 }
-
 .badge{
   padding:4px 10px;
   border-radius:999px;
   font-size:12px;
   font-weight:600;
 }
-
 .big{background:#1e40af}
 .small{background:#334155}
 
@@ -105,30 +99,27 @@ button{
   background:#2563eb;
   border:none;
   border-radius:999px;
-  padding:14px;
+  padding:12px 16px;
   color:white;
-  width:100%;
-  font-size:16px;
+  font-size:15px;
   font-weight:600;
 }
+img{max-width:100%;border-radius:12px;margin-top:10px}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="logo">P</div>
   <h2>PrismPredict AI</h2>
 </div>
 
-<!-- PERIOD -->
 <div class="card">
   <div class="label">PERIOD ID</div>
-  <div class="period" id="periodId">20260203100010369</div>
+  <div class="period" id="periodId"></div>
 </div>
 
-<!-- NUMBERS -->
 <div class="card">
   <div class="grid">
     <div class="num violet">0</div>
@@ -144,34 +135,22 @@ button{
   </div>
 </div>
 
-<!-- UPLOAD -->
 <div class="card">
   <div class="upload">
-    📷 Upload Data
+    <div>📷 Upload Data (Fast Extract)</div>
+    <input type="file" id="photoInput" accept="image/*">
+    <button onclick="extractFast()">Extract</button>
+    <div id="status"></div>
+    <img id="preview">
   </div>
 </div>
 
-<!-- HISTORY -->
 <div class="card">
   <div class="label">History Log</div>
-
-  <div class="history-item">
-    <div>
-      <b>8</b> <span style="color:#ef4444">Red</span>
-    </div>
-    <span class="badge big">Big</span>
-  </div>
-
-  <div class="history-item">
-    <div>
-      <b>9</b> <span style="color:#22c55e">Green</span>
-    </div>
-    <span class="badge big">Big</span>
-  </div>
-
+  <div id="history"></div>
 </div>
 
-<button>Predict Next</button>
-
+<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
