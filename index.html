@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI Predictor</title>
+<title>Next Number Predictor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -18,62 +18,52 @@ body{
   border-radius:14px;
   margin-bottom:16px;
 }
+input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
 button{
   background:#2563eb;
   border:none;
-  padding:10px 16px;
+  padding:12px;
   color:white;
   border-radius:10px;
-  font-size:15px;
+  font-size:16px;
+  width:100%;
+  margin-top:10px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
-}
-.num{
-  padding:14px;
-  border-radius:10px;
-  font-size:18px;
-  font-weight:bold;
-  text-align:center;
-}
-.green{background:#22c55e}
-.red{background:#ef4444}
-.violet{background:#8b5cf6}
 .result{
-  font-size:26px;
+  font-size:28px;
   font-weight:800;
+  text-align:center;
+  margin-top:10px;
+}
+.note{
+  color:#94a3b8;
+  font-size:13px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>AI Next Predictor</h2>
+<h2>AI Next Number Predictor</h2>
 
 <div class="box">
-  <input type="file" id="photo" accept="image/*">
-  <button onclick="extract()">Extract Data</button>
-  <div id="status"></div>
+  <h3>Enter last 10 results</h3>
+  <input id="data" placeholder="Example: 3,7,9,1,5,8,2,4,6,0">
+  <div class="note">Only numbers 0–9, separated by commas</div>
+  <button onclick="predict()">Predict Next</button>
 </div>
 
 <div class="box">
-  <h3>Extracted Data (from photo)</h3>
-  <div id="extracted"></div>
+  <h3>🤖 Predicted Next Number</h3>
+  <div class="result" id="output">—</div>
 </div>
 
-<div class="box">
-  <h3>Add Latest Result (Manual)</h3>
-  <div class="grid" id="buttons"></div>
-</div>
-
-<div class="box">
-  <h3>🤖 AI Prediction (Next)</h3>
-  <div class="result" id="prediction">Waiting for data</div>
-</div>
-
-<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
