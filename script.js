@@ -1,86 +1,90 @@
-// ===== PERIOD ID (LIKE REAL APPS) =====
-function getPeriodId(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,"0");
-  const day = String(d.getDate()).padStart(2,"0");
-  const seq = Math.floor(Date.now()/60000);
-  return `${y}${m}${day}${seq}`;
-}
-setInterval(()=>periodId.innerText=getPeriodId(),1000);
-periodId.innerText=getPeriodId();
-
-// ===== STATE =====
 let history = [];
+let photoLoaded = false;
 
-// ===== COLOR & SIZE =====
+const status = document.getElementById("status");
+const photoData = document.getElementById("photoData");
+const prediction = document.getElementById("prediction");
+const btnBox = document.getElementById("buttons");
+
+// ===== COLOR =====
 function color(n){
-  if(n===0||n===5) return "Violet";
-  return n%2===0 ? "Red" : "Green";
-}
-function size(n){
-  return n>=5 ? "Big" : "Small";
+  if(n===0||n===5) return "violet";
+  return n%2===0?"red":"green";
 }
 
-// ===== NUMBER GRID =====
-const grid = document.getElementById("numberGrid");
+// ===== CREATE NUMBER BUTTONS (LOCKED INITIALLY) =====
+let btns=[];
 for(let i=0;i<=9;i++){
-  const d = document.createElement("div");
-  d.className = `num ${color(i)==="Red"?"red":color(i)==="Green"?"green":"violet"}`;
-  d.innerText = i;
-  d.onclick = ()=>addLatest(i);
-  grid.appendChild(d);
+  const d=document.createElement("div");
+  d.className="num "+color(i);
+  d.innerText=i;
+  d.onclick=()=>manualAdd(i);
+  btnBox.appendChild(d);
+  btns.push(d);
 }
 
-// ===== ADD LATEST RESULT =====
-function addLatest(n){
-  history.unshift({
-    period:getPeriodId(),
-    num:n
-  });
-  if(history.length>12) history.pop();
-  renderHistory();
-  predictNext();
-}
-
-// ===== HISTORY UI =====
-function renderHistory(){
-  historyBox.innerHTML="";
-  history.forEach(h=>{
-    const div=document.createElement("div");
-    div.className="history-item";
-    div.innerHTML=`
-      <div>${h.period}<br><b>${h.num}</b> ${color(h.num)}</div>
-      <span class="badge ${size(h.num).toLowerCase()}">${size(h.num)}</span>
-    `;
-    historyBox.appendChild(div);
+// ===== ENABLE BUTTONS =====
+function enableButtons(){
+  btns.forEach(b=>{
+    b.style.opacity="1";
+    b.style.pointerEvents="auto";
   });
 }
-const historyBox=document.getElementById("history");
 
-// ===== AI PREDICTION (SIMPLE & STABLE) =====
-function predictNext(){
-  if(history.length<4){
-    prediction.innerText="Need more data";
+// ===== OCR PHOTO (MUST BE FIRST) =====
+function readPhoto(){
+  const file=document.getElementById("photo").files[0];
+  if(!file){
+    status.innerText="Select image first";
     return;
   }
 
-  const nums = history.map(h=>h.num);
+  status.innerText="Reading photo...";
+  Tesseract.recognize(
+    file,
+    "eng",
+    {tessedit_char_whitelist:"0123456789"}
+  ).then(({data:{text}})=>{
+    const nums=(text.match(/\d/g)||[])
+      .map(n=>parseInt(n))
+      .filter(n=>n>=0&&n<=9);
+
+    if(nums.length<3){
+      status.innerText="Not enough data in photo";
+      return;
+    }
+
+    history = nums.slice(-5);
+    photoData.innerText = history.join(", ");
+    photoLoaded = true;
+    enableButtons();
+    prediction.innerText = "Add latest result";
+    status.innerText="Photo data loaded";
+  });
+}
+
+// ===== MANUAL ADD (ONLY AFTER PHOTO) =====
+function manualAdd(n){
+  if(!photoLoaded) return;
+
+  history.push(n);
+  if(history.length>6) history.shift();
+  photoData.innerText = history.join(", ");
+  predictNext();
+}
+
+// ===== AI PREDICTION =====
+function predictNext(){
   let score = Array(10).fill(0);
 
-  // frequency
-  nums.forEach(n=>score[n]+=2);
+  history.forEach(n=>score[n]+=2);       // frequency
+  history.slice(-3).forEach(n=>score[n]+=3); // trend
 
-  // recent trend
-  nums.slice(0,3).forEach(n=>score[n]+=3);
-
-  // gap logic
   for(let i=0;i<=9;i++){
-    if(!nums.includes(i)) score[i]+=4;
+    if(!history.includes(i)) score[i]+=4; // gap
   }
 
-  // avoid repeat
-  score[nums[0]]-=5;
+  score[history[history.length-1]]-=5;  // avoid repeat
 
   const pick = score.indexOf(Math.max(...score));
   prediction.innerText = pick;
