@@ -26,7 +26,6 @@ h2{margin-bottom:12px}
   text-align:center;
   font-size:22px;
   font-weight:700;
-  box-shadow:0 4px 12px rgba(0,0,0,.35);
 }
 
 .green{background:#22c55e}
@@ -49,16 +48,6 @@ button{
   color:white;
   font-size:15px;
   margin-top:8px;
-}
-
-textarea{
-  width:100%;
-  height:60px;
-  background:#020617;
-  color:white;
-  border:1px solid #334155;
-  border-radius:10px;
-  padding:8px;
 }
 
 img{
@@ -84,7 +73,7 @@ img{
 <div class="grid" id="buttons"></div>
 
 <div class="box">
-  <h3>Prediction</h3>
+  <h3>Advanced Prediction</h3>
   <button onclick="predict()">Predict Upcoming</button>
   <div id="predictionResult"></div>
 </div>
@@ -95,22 +84,14 @@ img{
 </div>
 
 <div class="box">
-  <h3>Upload Old Data</h3>
-  <textarea id="dataInput" placeholder="Example: 1,3,5,7,9"></textarea>
-  <button onclick="loadData()">Load Data</button>
-</div>
-
-<div class="box">
-  <h3>Add Photo / Auto Extract</h3>
+  <h3>Add Photo (Auto Extract)</h3>
   <input type="file" id="photoInput" accept="image/*">
   <button onclick="startOCR()">Extract From Photo</button>
-  <div id="ocrStatus" style="color:#38bdf8;margin-top:6px"></div>
+  <div id="ocrStatus" style="color:#38bdf8"></div>
   <img id="photoPreview">
 </div>
 
-<!-- OCR LIBRARY (MUST BE BEFORE script.js) -->
 <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
