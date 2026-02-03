@@ -1,153 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>PrismPredict AI</title>
+<title>AI Predictor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-*{box-sizing:border-box}
 body{
-  margin:0;
-  font-family:system-ui,-apple-system;
-  background:linear-gradient(180deg,#020617,#020617 40%,#030712);
+  background:#0b1220;
   color:#fff;
+  font-family:system-ui;
+  padding:20px;
+}
+.box{
+  background:#111827;
   padding:16px;
-}
-.header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:16px;
-}
-.logo{
-  width:42px;height:42px;
-  background:#6366f1;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-}
-.card{
-  background:#020617;
-  border:1px solid #1e293b;
-  border-radius:18px;
-  padding:16px;
-  margin-bottom:16px;
-}
-.label{
-  color:#94a3b8;
-  font-size:13px;
-  margin-bottom:6px;
-}
-.period{
-  background:#020617;
-  border:1px solid #334155;
   border-radius:14px;
-  padding:14px;
-  font-size:16px;
-  font-weight:600;
+  margin-bottom:16px;
+}
+button{
+  background:#2563eb;
+  border:none;
+  padding:10px 16px;
+  color:white;
+  border-radius:10px;
+  font-size:15px;
 }
 .grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:12px;
+  gap:8px;
 }
 .num{
-  padding:20px 0;
-  border-radius:14px;
-  font-size:22px;
-  font-weight:700;
+  padding:14px;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:bold;
   text-align:center;
 }
 .green{background:#22c55e}
 .red{background:#ef4444}
 .violet{background:#8b5cf6}
-
-.upload{
-  border:2px dashed #334155;
-  padding:18px;
-  border-radius:14px;
-  text-align:center;
-  color:#94a3b8;
+.result{
+  font-size:26px;
+  font-weight:800;
 }
-.upload button{
-  margin-top:10px;
-}
-
-.history-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px;
-  border-radius:12px;
-  background:#020617;
-  border:1px solid #1e293b;
-  margin-bottom:10px;
-}
-.badge{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:600;
-}
-.big{background:#1e40af}
-.small{background:#334155}
-
-button{
-  background:#2563eb;
-  border:none;
-  border-radius:999px;
-  padding:12px 16px;
-  color:white;
-  font-size:15px;
-  font-weight:600;
-}
-img{max-width:100%;border-radius:12px;margin-top:10px}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="logo">P</div>
-  <h2>PrismPredict AI</h2>
+<h2>AI Next Predictor</h2>
+
+<div class="box">
+  <input type="file" id="photo" accept="image/*">
+  <button onclick="extract()">Extract Data</button>
+  <div id="status"></div>
 </div>
 
-<div class="card">
-  <div class="label">PERIOD ID</div>
-  <div class="period" id="periodId"></div>
+<div class="box">
+  <h3>Extracted Data (from photo)</h3>
+  <div id="extracted"></div>
 </div>
 
-<div class="card">
-  <div class="grid">
-    <div class="num violet">0</div>
-    <div class="num green">1</div>
-    <div class="num red">2</div>
-    <div class="num green">3</div>
-    <div class="num red">4</div>
-    <div class="num violet">5</div>
-    <div class="num red">6</div>
-    <div class="num green">7</div>
-    <div class="num red">8</div>
-    <div class="num green">9</div>
-  </div>
+<div class="box">
+  <h3>Add Latest Result (Manual)</h3>
+  <div class="grid" id="buttons"></div>
 </div>
 
-<div class="card">
-  <div class="upload">
-    <div>📷 Upload Data (Fast Extract)</div>
-    <input type="file" id="photoInput" accept="image/*">
-    <button onclick="extractFast()">Extract</button>
-    <div id="status"></div>
-    <img id="preview">
-  </div>
-</div>
-
-<div class="card">
-  <div class="label">History Log</div>
-  <div id="history"></div>
+<div class="box">
+  <h3>🤖 AI Prediction (Next)</h3>
+  <div class="result" id="prediction">Waiting for data</div>
 </div>
 
 <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
