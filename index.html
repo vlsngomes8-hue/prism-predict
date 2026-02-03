@@ -1,56 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Next Predictor</title>
+<title>PrismPredict AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{background:#0b1220;color:#fff;font-family:Arial;padding:14px}
-.box{background:#111827;padding:12px;border-radius:12px;margin-top:12px}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.btn{padding:16px;border-radius:10px;font-size:20px;font-weight:bold;text-align:center}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system;
+  background:linear-gradient(180deg,#020617,#020617 40%,#030712);
+  color:#fff;
+  padding:16px;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+.logo{
+  width:42px;height:42px;
+  background:#6366f1;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+
+.card{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+.label{
+  color:#94a3b8;
+  font-size:13px;
+  margin-bottom:6px;
+}
+
+.period{
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:14px;
+  padding:14px;
+  font-size:16px;
+  font-weight:600;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+}
+
+.num{
+  padding:20px 0;
+  border-radius:14px;
+  font-size:22px;
+  font-weight:700;
+  text-align:center;
+}
+
 .green{background:#22c55e}
 .red{background:#ef4444}
 .violet{background:#8b5cf6}
-button{padding:8px 14px;border:none;border-radius:8px;background:#2563eb;color:white;margin-top:6px}
-img{max-width:100%;border-radius:10px;margin-top:8px}
+
+.upload{
+  border:2px dashed #334155;
+  padding:18px;
+  border-radius:14px;
+  text-align:center;
+  color:#94a3b8;
+}
+
+.history-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-radius:12px;
+  background:#020617;
+  border:1px solid #1e293b;
+  margin-bottom:10px;
+}
+
+.badge{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+
+.big{background:#1e40af}
+.small{background:#334155}
+
+button{
+  background:#2563eb;
+  border:none;
+  border-radius:999px;
+  padding:14px;
+  color:white;
+  width:100%;
+  font-size:16px;
+  font-weight:600;
+}
 </style>
 </head>
 
 <body>
 
-<h2>AI Next Predictor</h2>
-
-<div class="box">
-  <b>Current Period:</b>
-  <span id="period"></span>
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">P</div>
+  <h2>PrismPredict AI</h2>
 </div>
 
-<div class="box">
-  <h3>Upload Latest Photo</h3>
-  <input type="file" id="photoInput" accept="image/*">
-  <button onclick="extract()">Extract Latest Data</button>
-  <div id="status"></div>
-  <img id="preview">
+<!-- PERIOD -->
+<div class="card">
+  <div class="label">PERIOD ID</div>
+  <div class="period" id="periodId">20260203100010369</div>
 </div>
 
-<div class="box">
-  <h3>🤖 AI Next Prediction</h3>
-  <div id="prediction">Upload photo first</div>
+<!-- NUMBERS -->
+<div class="card">
+  <div class="grid">
+    <div class="num violet">0</div>
+    <div class="num green">1</div>
+    <div class="num red">2</div>
+    <div class="num green">3</div>
+    <div class="num red">4</div>
+    <div class="num violet">5</div>
+    <div class="num red">6</div>
+    <div class="num green">7</div>
+    <div class="num red">8</div>
+    <div class="num green">9</div>
+  </div>
 </div>
 
-<div class="box">
-  <h3>Add Result Number</h3>
-  <div class="grid" id="buttons"></div>
+<!-- UPLOAD -->
+<div class="card">
+  <div class="upload">
+    📷 Upload Data
+  </div>
 </div>
 
-<div class="box">
-  <h3>Latest History</h3>
-  <div id="history"></div>
+<!-- HISTORY -->
+<div class="card">
+  <div class="label">History Log</div>
+
+  <div class="history-item">
+    <div>
+      <b>8</b> <span style="color:#ef4444">Red</span>
+    </div>
+    <span class="badge big">Big</span>
+  </div>
+
+  <div class="history-item">
+    <div>
+      <b>9</b> <span style="color:#22c55e">Green</span>
+    </div>
+    <span class="badge big">Big</span>
+  </div>
+
 </div>
 
-<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
-<script src="script.js"></script>
+<button>Predict Next</button>
+
 </body>
 </html>
