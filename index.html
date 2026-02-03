@@ -1,94 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>PrismPredict AI</title>
+<title>AI Predictor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
-  background:#020617;
-  color:#fff;
-  font-family:system-ui,sans-serif;
-  padding:14px;
-}
-h2{margin-bottom:12px}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-}
-
-.btn{
-  padding:22px;
-  border-radius:14px;
-  text-align:center;
-  font-size:22px;
-  font-weight:700;
-}
-
+body{background:#0b1220;color:#fff;font-family:Arial;padding:14px}
+.box{background:#111827;padding:12px;border-radius:12px;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.btn{padding:16px;border-radius:10px;font-size:20px;font-weight:bold;text-align:center}
 .green{background:#22c55e}
 .red{background:#ef4444}
 .violet{background:#8b5cf6}
-
-.box{
-  background:#020617;
-  border:1px solid #1e293b;
-  padding:14px;
-  border-radius:16px;
-  margin-top:16px;
-}
-
-button{
-  padding:10px 16px;
-  border:none;
-  border-radius:10px;
-  background:#2563eb;
-  color:white;
-  font-size:15px;
-  margin-top:8px;
-}
-
-img{
-  max-width:100%;
-  border-radius:12px;
-  margin-top:10px;
-}
+button{padding:8px 14px;border:none;border-radius:8px;background:#2563eb;color:white}
+img{max-width:100%;border-radius:10px;margin-top:8px}
 </style>
 </head>
 
 <body>
 
-<h2>PrismPredict AI</h2>
+<h2>AI Trend Predictor</h2>
 
 <div class="box">
-  <b>Current Period:</b>
-  <span id="currentPeriod"></span><br>
-  <small style="color:#94a3b8">
-    Next update in <span id="timer"></span>s
-  </small>
-</div>
-
-<div class="grid" id="buttons"></div>
-
-<div class="box">
-  <h3>Advanced Prediction</h3>
-  <button onclick="predict()">Predict Upcoming</button>
-  <div id="predictionResult"></div>
+  <b>Current Period:</b> <span id="period"></span>
 </div>
 
 <div class="box">
-  <h3>History</h3>
-  <div id="history"></div>
-</div>
-
-<div class="box">
-  <h3>Add Photo (Auto Extract)</h3>
+  <h3>Upload Latest Photo</h3>
   <input type="file" id="photoInput" accept="image/*">
-  <button onclick="startOCR()">Extract From Photo</button>
-  <div id="ocrStatus" style="color:#38bdf8"></div>
-  <img id="photoPreview">
+  <button onclick="extract()">Extract Data</button>
+  <div id="status"></div>
+  <img id="preview">
+</div>
+
+<div class="box">
+  <h3>🤖 AI Prediction</h3>
+  <div id="prediction">Upload data first</div>
+</div>
+
+<div class="box">
+  <h3>Add Result Number</h3>
+  <div class="grid" id="buttons"></div>
+</div>
+
+<div class="box">
+  <h3>Latest Data</h3>
+  <div id="history"></div>
 </div>
 
 <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
