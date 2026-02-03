@@ -1,93 +1,63 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-/* ===== AUTO PERIOD (SIMPLE & SAFE) ===== */
+const periodEl = document.getElementById("periodId");
+const historyEl = document.getElementById("history");
+const preview = document.getElementById("preview");
+const status = document.getElementById("status");
+
+let history = [];
+
+// ===== AUTO PERIOD (REAL-TIME SIMPLE) =====
 function updatePeriod(){
-  document.getElementById("period").innerText =
-    Math.floor(Date.now() / 60000); // updates every minute
+  periodEl.innerText = Math.floor(Date.now() / 60000);
 }
 setInterval(updatePeriod, 1000);
 updatePeriod();
 
-/* ===== STATE ===== */
-let data = []; // latest numbers only
-const status = document.getElementById("status");
-const preview = document.getElementById("preview");
-
-/* ===== COLOR / SIZE ===== */
+// ===== COLOR & SIZE =====
 function color(n){
-  if(n === 0 || n === 5) return "VIOLET";
-  return n % 2 === 0 ? "RED" : "GREEN";
+  if(n === 0 || n === 5) return "Violet";
+  return n % 2 === 0 ? "Red" : "Green";
 }
-function size(n){ return n >= 5 ? "BIG" : "SMALL"; }
-
-/* ===== BUTTONS ===== */
-const btns = document.getElementById("buttons");
-for(let i=0;i<=9;i++){
-  const b = document.createElement("div");
-  b.className = "btn " + (color(i)==="RED"?"red":color(i)==="GREEN"?"green":"violet");
-  b.innerText = i;
-  b.onclick = () => addResult(i);
-  btns.appendChild(b);
+function size(n){
+  return n >= 5 ? "Big" : "Small";
 }
 
-/* ===== ADD RESULT NUMBER ===== */
-function addResult(n){
-  data.unshift(n);
-  if(data.length > 10) data.pop();
-  renderHistory();
-  aiPredict(); // AUTO predict next
+// ===== RENDER HISTORY =====
+function render(){
+  historyEl.innerHTML = "";
+  history.slice(0,12).forEach(n=>{
+    const div = document.createElement("div");
+    div.className = "history-item";
+    div.innerHTML = `
+      <div><b>${n}</b> ${color(n)}</div>
+      <span class="badge ${size(n).toLowerCase()}">${size(n)}</span>
+    `;
+    historyEl.appendChild(div);
+  });
 }
 
-/* ===== RENDER HISTORY ===== */
-function renderHistory(){
-  document.getElementById("history").innerHTML =
-    data.map(n => `${n} ${color(n)} ${size(n)}`).join("<br>");
-}
-
-/* ===== 🤖 AI PREDICTION (AUTO) ===== */
-function aiPredict(){
-  if(data.length < 4){
-    document.getElementById("prediction").innerText = "Need more data";
-    return;
-  }
-
-  let score = Array(10).fill(0);
-
-  // Frequency memory
-  data.forEach(n => score[n] += 2);
-
-  // Recent trend boost
-  data.slice(0,4).forEach(n => score[n] += 4);
-
-  // Gap (missing numbers)
-  for(let i=0;i<=9;i++){
-    const idx = data.indexOf(i);
-    score[i] += idx === -1 ? 5 : Math.min(idx,3);
-  }
-
-  // Avoid repeating last number
-  score[data[0]] -= 5;
-
-  const pick = score.indexOf(Math.max(...score));
-
-  document.getElementById("prediction").innerText =
-    `${pick} ${color(pick)} ${size(pick)} (AI)`;
-}
-
-/* ===== OCR EXTRACT (LATEST DATA ONLY) ===== */
-window.extract = function(){
+// ===== FAST OCR EXTRACT =====
+window.extractFast = function(){
   const file = document.getElementById("photoInput").files[0];
   if(!file){
-    status.innerText = "Select photo first";
+    status.innerText = "Select image first";
     return;
   }
 
-  const r = new FileReader();
-  r.onload = () => {
-    preview.src = r.result;
-    status.innerText = "Reading image...";
+  const reader = new FileReader();
+  reader.onload = () => {
+    preview.src = reader.result;
+    status.innerText = "Reading image (fast)…";
 
-    Tesseract.recognize(r.result, "eng").then(({data:{text}})=>{
+    Tesseract.recognize(
+      reader.result,
+      "eng",
+      {
+        tessedit_char_whitelist: "0123456789",
+        classify_bln_numeric_mode: 1
+      }
+    ).then(({data:{text}})=>{
       const nums = (text.match(/\d/g) || [])
         .map(n=>parseInt(n))
         .filter(n=>n>=0 && n<=9);
@@ -97,14 +67,12 @@ window.extract = function(){
         return;
       }
 
-      // ONLY latest extracted numbers
-      data = nums.slice(-5);
-      renderHistory();
-      aiPredict(); // AUTO predict after extract
-      status.innerText = "Latest data loaded";
+      history = nums.reverse(); // latest on top
+      render();
+      status.innerText = "Data extracted successfully";
     });
   };
-  r.readAsDataURL(file);
+  reader.readAsDataURL(file);
 };
 
 });
