@@ -1,87 +1,36 @@
-let extractedData = [];
-let history = [];
+function predict(){
+  const input = document.getElementById("data").value;
 
-const extractedDiv = document.getElementById("extracted");
-const predictionDiv = document.getElementById("prediction");
-const statusDiv = document.getElementById("status");
+  let arr = input.split(",")
+    .map(n => parseInt(n.trim()))
+    .filter(n => !isNaN(n) && n >= 0 && n <= 9);
 
-// ===== COLOR =====
-function color(n){
-  if(n===0||n===5) return "violet";
-  return n%2===0?"red":"green";
-}
-
-// ===== CREATE BUTTONS =====
-const btns = document.getElementById("buttons");
-for(let i=0;i<=9;i++){
-  const d=document.createElement("div");
-  d.className="num "+color(i);
-  d.innerText=i;
-  d.onclick=()=>addManual(i);
-  btns.appendChild(d);
-}
-
-// ===== OCR EXTRACT =====
-function extract(){
-  const file=document.getElementById("photo").files[0];
-  if(!file){
-    statusDiv.innerText="Select image first";
+  if(arr.length < 8){
+    document.getElementById("output").innerText =
+      "Enter at least 8–10 numbers";
     return;
   }
 
-  statusDiv.innerText="Reading image...";
-  Tesseract.recognize(
-    file,
-    "eng",
-    { tessedit_char_whitelist:"0123456789" }
-  ).then(({data:{text}})=>{
-    extractedData = (text.match(/\d/g)||[])
-      .map(n=>parseInt(n))
-      .filter(n=>n>=0&&n<=9);
-
-    if(extractedData.length===0){
-      statusDiv.innerText="No numbers found";
-      return;
-    }
-
-    history = extractedData.slice(-5); // ONLY latest
-    extractedDiv.innerText = history.join(", ");
-    statusDiv.innerText="Data loaded. Add next result.";
-    predictionDiv.innerText="Waiting for manual input";
-  });
-}
-
-// ===== MANUAL ADD =====
-function addManual(n){
-  history.push(n);
-  if(history.length>6) history.shift();
-  extractedDiv.innerText = history.join(", ");
-  predictNext();
-}
-
-// ===== AI PREDICTION =====
-function predictNext(){
-  if(history.length<4){
-    predictionDiv.innerText="Need more data";
-    return;
-  }
+  // Use last 10 only
+  arr = arr.slice(-10);
 
   let score = Array(10).fill(0);
 
-  // frequency
-  history.forEach(n=>score[n]+=2);
+  // 1️⃣ Frequency (hot numbers)
+  arr.forEach(n => score[n] += 2);
 
-  // recent trend
-  history.slice(-3).forEach(n=>score[n]+=3);
+  // 2️⃣ Recent trend (last 4 stronger)
+  arr.slice(-4).forEach(n => score[n] += 3);
 
-  // gap
+  // 3️⃣ Gap (numbers missing)
   for(let i=0;i<=9;i++){
-    if(!history.includes(i)) score[i]+=4;
+    if(!arr.includes(i)) score[i] += 4;
   }
 
-  // avoid repeat
-  score[history[history.length-1]] -= 5;
+  // 4️⃣ Avoid repeating last
+  score[arr[arr.length-1]] -= 5;
 
   const pick = score.indexOf(Math.max(...score));
-  predictionDiv.innerText = pick;
+
+  document.getElementById("output").innerText = pick;
 }
