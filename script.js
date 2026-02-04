@@ -63,3 +63,19 @@ function addResult(num) {
 }
 
 render();
+async function uploadPhoto() {
+  let file = document.getElementById("photo").files[0];
+  let fd = new FormData();
+  fd.append("file", file);
+
+  let res = await fetch("https://YOUR-BACKEND-URL/ocr", {
+    method: "POST",
+    body: fd
+  });
+
+  let data = await res.json();
+  data.forEach(r => history.push(r));
+
+  localStorage.setItem("history", JSON.stringify(history));
+  render();
+}
