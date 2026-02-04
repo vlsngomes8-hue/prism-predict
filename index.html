@@ -1,108 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>PrismPredict AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colour Prediction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      margin: 0;
-      background: #0b1220;
-      font-family: Arial, sans-serif;
-      color: #fff;
-    }
-    header {
-      padding: 15px;
-      background: #111a2e;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .container {
-      padding: 15px;
+      background:#0f172a;
+      color:white;
+      font-family:Arial;
+      padding:15px;
     }
     .card {
-      background: #141f3a;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
+      background:#1e293b;
+      padding:15px;
+      border-radius:10px;
+      margin-bottom:15px;
     }
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #223055;
+    button {
+      padding:10px;
+      margin:5px;
+      font-size:16px;
+      border:none;
+      border-radius:8px;
     }
-    .big { color: #4ade80; }
-    .small { color: #f87171; }
-    .red { color: #f87171; }
-    .green { color: #4ade80; }
-    .violet { color: #c084fc; }
-
-    .numbers {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .num-btn {
-      padding: 15px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      color: #fff;
-    }
-    .n-red { background:#ef4444; }
-    .n-green { background:#22c55e; }
-    .n-violet { background:#8b5cf6; }
-
-    .predict-box {
-      font-size: 18px;
-      text-align: center;
-    }
+    .red { color:#f87171 }
+    .green { color:#4ade80 }
+    .violet { color:#c084fc }
   </style>
 </head>
+
 <body>
 
-<header>PrismPredict AI</header>
+<h2>Colour Prediction</h2>
 
-<div class="container">
+<div class="card">
+  <b>Next Period</b>
+  <div id="period"></div>
+</div>
 
-  <div class="card">
-    <b>Next Period ID</b>
-    <div id="period"></div>
-  </div>
+<div class="card">
+  <b>Prediction</b>
+  <div id="prediction">Waiting...</div>
+</div>
 
-  <div class="card">
-    <b>Prediction</b>
-    <div class="predict-box" id="prediction">Waiting for data</div>
-  </div>
+<div class="card">
+  <b>Add Result</b><br>
+  <button onclick="add(0)">0</button>
+  <button onclick="add(1)">1</button>
+  <button onclick="add(2)">2</button>
+  <button onclick="add(3)">3</button>
+  <button onclick="add(4)">4</button>
+  <button onclick="add(5)">5</button>
+  <button onclick="add(6)">6</button>
+  <button onclick="add(7)">7</button>
+  <button onclick="add(8)">8</button>
+  <button onclick="add(9)">9</button>
+</div>
 
-  <div class="card">
-    <b>Add Result</b>
-    <div class="numbers">
-      <button class="num-btn n-violet" onclick="addResult(0)">0</button>
-      <button class="num-btn n-green" onclick="addResult(1)">1</button>
-      <button class="num-btn n-red" onclick="addResult(2)">2</button>
-      <button class="num-btn n-green" onclick="addResult(3)">3</button>
-      <button class="num-btn n-red" onclick="addResult(4)">4</button>
-      <button class="num-btn n-violet" onclick="addResult(5)">5</button>
-      <button class="num-btn n-red" onclick="addResult(6)">6</button>
-      <button class="num-btn n-green" onclick="addResult(7)">7</button>
-      <button class="num-btn n-red" onclick="addResult(8)">8</button>
-      <button class="num-btn n-green" onclick="addResult(9)">9</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <b>History</b>
-    <div id="history"></div>
-  </div>
-
+<div class="card">
+  <b>History</b>
+  <div id="history"></div>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-<input type="file" id="photo" accept="image/*">
-<button onclick="uploadPhoto()">Upload Screenshot</button>
